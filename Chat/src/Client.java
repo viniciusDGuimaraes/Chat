@@ -14,59 +14,59 @@ import java.io.Writer;
 import java.net.Socket;
 import javax.swing.*;
 
-public class Cliente extends JFrame implements ActionListener, KeyListener
+public class Client extends JFrame implements ActionListener, KeyListener
 { 
 	private static final long serialVersionUID = 1L;
-	private JTextArea texto;
+	private JTextArea text;
 	private JTextField txtMsg;
 	private JButton btnSend;
-	private JButton btnSair;
+	private JButton btnExit;
 	private JLabel lblHistorico;
 	private JLabel lblMsg;
 	private JPanel pnlContent;
 	private Socket socket;
-	private OutputStream ou ;
+	private OutputStream out;
 	private Writer ouw; 
 	private BufferedWriter bfw;
 	private JTextField txtIP;
 	private JTextField txtPorta;
-	private JTextField txtNome;
+	private JTextField txtName;
 	
-	public Cliente() throws IOException
+	public Client() throws IOException
 	{                  
 		JLabel lblMessage = new JLabel("Verificar!");
 		txtIP = new JTextField("127.0.0.1");
 		txtPorta = new JTextField("12345");
-		txtNome = new JTextField("Cliente");                
-		Object[] texts = {lblMessage, txtIP, txtPorta, txtNome };  
+		txtName = new JTextField("Cliente");                
+		Object[] texts = {lblMessage, txtIP, txtPorta, txtName };  
 		JOptionPane.showMessageDialog(null, texts);              
 		pnlContent = new JPanel();
-		texto = new JTextArea(10,20);
-		texto.setEditable(false);
-		texto.setBackground(new Color(240,240,240));
+		text = new JTextArea(10,20);
+		text.setEditable(false);
+		text.setBackground(new Color(240,240,240));
 		txtMsg = new JTextField(20);
 		lblHistorico = new JLabel("Histórico");
 		lblMsg = new JLabel("Mensagem");
 		btnSend = new JButton("Enviar");
 		btnSend.setToolTipText("Enviar Mensagem");
-		btnSair = new JButton("Sair");
-		btnSair.setToolTipText("Sair do Chat");
+		btnExit = new JButton("Sair");
+		btnExit.setToolTipText("Sair do Chat");
 		btnSend.addActionListener(this);
-		btnSair.addActionListener(this);
+		btnExit.addActionListener(this);
 		btnSend.addKeyListener(this);
 		txtMsg.addKeyListener(this);
-		JScrollPane scroll = new JScrollPane(texto);
-		texto.setLineWrap(true);  
+		JScrollPane scroll = new JScrollPane(text);
+		text.setLineWrap(true);  
 		pnlContent.add(lblHistorico);
 		pnlContent.add(scroll);
 		pnlContent.add(lblMsg);
 		pnlContent.add(txtMsg);
-		pnlContent.add(btnSair);
+		pnlContent.add(btnExit);
 		pnlContent.add(btnSend);
 		pnlContent.setBackground(Color.LIGHT_GRAY);                                 
-		texto.setBorder(BorderFactory.createEtchedBorder(Color.BLUE,Color.BLUE));
+		text.setBorder(BorderFactory.createEtchedBorder(Color.BLUE,Color.BLUE));
 		txtMsg.setBorder(BorderFactory.createEtchedBorder(Color.BLUE, Color.BLUE));                    
-		setTitle(txtNome.getText());
+		setTitle(txtName.getText());
 		setContentPane(pnlContent);
 		setLocationRelativeTo(null);
 		setResizable(false);
@@ -75,33 +75,33 @@ public class Cliente extends JFrame implements ActionListener, KeyListener
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
-	public void conectar() throws IOException
+	public void connect() throws IOException
 	{    
 		socket = new Socket(txtIP.getText(),Integer.parseInt(txtPorta.getText()));
-		ou = socket.getOutputStream();
-		ouw = new OutputStreamWriter(ou);
+		out = socket.getOutputStream();
+		ouw = new OutputStreamWriter(out);
 		bfw = new BufferedWriter(ouw);
-		bfw.write(txtNome.getText()+"\r\n");
+		bfw.write(txtName.getText()+"\r\n");
 		bfw.flush();
 	}
 	
-	public void enviarMensagem(String msg) throws IOException
+	public void sendMessage(String msg) throws IOException
 	{    
 	    if(msg.equals("Sair"))
 	    {
 	      bfw.write("Desconectado \r\n");
-	      texto.append("Desconectado \r\n");
+	      text.append("Desconectado \r\n");
 	    }
 	    else
 	    {
 	      bfw.write(msg+"\r\n");
-	      texto.append(txtNome.getText() + " diz -> " + txtMsg.getText()+"\r\n");
+	      text.append(txtName.getText() + " diz -> " + txtMsg.getText()+"\r\n");
 	    }
 	    bfw.flush();
 	    txtMsg.setText("");        
 	}
 	
-	public void escutar() throws IOException
+	public void listen() throws IOException
 	{    
 	   InputStream in = socket.getInputStream();
 	   InputStreamReader inr = new InputStreamReader(in);
@@ -115,22 +115,22 @@ public class Cliente extends JFrame implements ActionListener, KeyListener
 	    		msg = bfr.readLine();
 	    		if(msg.equals("Sair"))
 	    		{
-	    			texto.append("Servidor caiu! \r\n");	    			
+	    			text.append("Servidor caiu! \r\n");	    			
 	    		}
 		        else
 		        {
-		        	texto.append(msg+"\r\n");	
+		        	text.append(msg+"\r\n");	
 		        }
 	        }
 	    }
 	}
 	
-	public void sair() throws IOException
+	public void exit() throws IOException
 	{    
-	   enviarMensagem("Sair");
+	   sendMessage("Sair");
 	   bfw.close();
 	   ouw.close();
-	   ou.close();
+	   out.close();
 	   socket.close();
 	}
 	
@@ -140,13 +140,13 @@ public class Cliente extends JFrame implements ActionListener, KeyListener
 	  {
 	     if(e.getActionCommand().equals(btnSend.getActionCommand()))
 	     {
-	    	 enviarMensagem(txtMsg.getText());	    	 
+	    	 sendMessage(txtMsg.getText());	    	 
 	     }
 	     else
 	     {
-	    	 if(e.getActionCommand().equals(btnSair.getActionCommand()))
+	    	 if(e.getActionCommand().equals(btnExit.getActionCommand()))
 	    	 {
-	    		 sair();	    		 
+	    		 exit();	    		 
 	    	 }
 	     }
 	  } 
@@ -157,12 +157,14 @@ public class Cliente extends JFrame implements ActionListener, KeyListener
 	}
 	
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e)
+	{
 	                
 	    if(e.getKeyCode() == KeyEvent.VK_ENTER){
 	       try {
-	          enviarMensagem(txtMsg.getText());
-	       } catch (IOException e1) {
+	          sendMessage(txtMsg.getText());
+	       }
+	       catch (IOException e1) {
 	           // TODO Auto-generated catch block
 	           e1.printStackTrace();
 	       }                                                          
@@ -181,8 +183,8 @@ public class Cliente extends JFrame implements ActionListener, KeyListener
 	
 	public static void main(String []args) throws IOException
 	{    
-	   Cliente app = new Cliente();
-	   app.conectar();
-	   app.escutar();
+	   Client app = new Client();
+	   app.connect();
+	   app.listen();
 	}
 }
